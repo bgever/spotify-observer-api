@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, Logger } from '@nestjs/common';
 
 import { JwtService } from '../../core/jwt/jwt.service';
 import { RedisService } from '../../core/redis/redis.service';
@@ -10,6 +10,8 @@ import { AuthorizeDto } from './dtos/authorize-dto';
 
 @Controller('auth')
 export class AuthController {
+
+  private readonly _logger = new Logger(AuthController.name);
 
   constructor(
     private _jwtSvc: JwtService,
@@ -26,14 +28,13 @@ export class AuthController {
   @Post('authorize')
   async authorize(@Body() dto: AuthorizeDto) {
 
-    console.log('DTO:', dto);
-
     let accessToken: string;
     let expiresAt: Date;
     let jwt: string;
 
     // Expect authorization code.
     if (dto.code) {
+      this._logger.verbose('Authorize by authorization code');
 
       // Exchange the authorization code for access and refresh tokens.
       const tokens = await this._oauthSvc.getTokensWithCode(dto.code);
@@ -54,6 +55,7 @@ export class AuthController {
       jwt = this._jwtSvc.create(userId);
 
     } else if (dto.jwt) {
+      this._logger.verbose('Authorize by JWT');
 
       // First ensure JWT is validated.
       let decodedJwt;
