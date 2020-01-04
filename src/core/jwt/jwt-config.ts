@@ -14,6 +14,13 @@ export class JwtConfig {
     public issuer?: string,
     public algorithm?: string
   ) {
+    const newlineRegex = /\\n/g;
+    if (typeof privateKey === 'string') {
+      this.privateKey = privateKey.replace(newlineRegex, '\n');
+    }
+    if (typeof publicKey === 'string') {
+      this.publicKey = publicKey.replace(newlineRegex, '\n');
+    }
     this.audience = (audiences || 'https://spotify.observer/app/').split('|');
     this.issuer = issuer || 'https://spotify.observer/api/v1/';
     this.algorithm = algorithm || 'RS256';
