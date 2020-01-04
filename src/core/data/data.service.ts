@@ -15,7 +15,7 @@ export class DataService {
   private _dbInstance: Db;
 
   constructor() {
-    this._mongo = new MongoClient(MONGO_URI);
+    this._mongo = new MongoClient(MONGO_URI, { useUnifiedTopology: true });
   }
 
   private async _db() {
