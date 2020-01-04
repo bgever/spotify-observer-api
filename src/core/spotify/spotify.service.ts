@@ -12,7 +12,7 @@ export class SpotifyService {
   async getUser(accessToken: string) {
     // Call user info API to determine user ID.
     const userResponse = await axios.get<UserResponse>('https://api.spotify.com/v1/me', {
-      headers: { Authorize: `Bearer ${accessToken}` }
+      headers: { Authorization: `Bearer ${accessToken}` }
     });
     return userResponse.data;
   }
