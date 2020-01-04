@@ -11,7 +11,8 @@ export class AxiosErrorFilter implements ExceptionFilter {
   catch(exception: AxiosError, host: ArgumentsHost) {
     this._logger.error(
       `Unhandled ${exception}`,
-      `${exception.stack}
+      `${exception.config.method.toUpperCase()} ${exception.config.url}
+${exception.stack}
 RESPONSE DATA (first ${MAX_RESPONSE_DATA} characters):
 ${JSON.stringify(exception.response.data).substr(0, MAX_RESPONSE_DATA)}`
     );
