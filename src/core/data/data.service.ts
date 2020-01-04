@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { MongoClient, Db } from 'mongodb';
 
 import { UserModel } from './models/user-model';
@@ -9,13 +9,18 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost';
  * Handles interactions with the MongoDB database.
  */
 @Injectable()
-export class DataService {
+export class DataService implements OnModuleInit {
 
   private _mongo: MongoClient;
   private _dbInstance: Db;
 
   constructor() {
     this._mongo = new MongoClient(MONGO_URI, { useUnifiedTopology: true });
+  }
+
+  async onModuleInit() {
+    // Attempt to connect to the database to be aware of connection issues on startup.
+    return await this._db();
   }
 
   private async _db() {
@@ -31,14 +36,16 @@ export class DataService {
   }
 
   async storeAccess(userId: string, refreshToken: string, scope: string, profile: any) {
-    (await this._users()).findOneAndUpdate(
+    return (await this._users()).findOneAndUpdate(
       { _id: userId },
       {
-        auth: {
-          refreshToken,
-          scope
+        $set: {
+          auth: {
+            refreshToken,
+            scope
+          },
+          profile, // TODO,
         },
-        profile, // TODO,
         $push: { logins: { at: new Date() } }
       },
       { upsert: true });
